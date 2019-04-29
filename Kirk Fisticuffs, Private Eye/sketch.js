@@ -13,10 +13,18 @@ let inventoryGridSize;
 let inventoryGrid;
 let inventoryScalar;
 let toolBar;
+let inventoryHolding;
+
 let itemFrame;
+let knuckles;
+let potato;
+let squash;
 
 function preload(){
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
+  knuckles = loadImage("assets/items/knuckles.png");
+  potato = loadImage("assets/items/potato.png");
+  squash = loadImage("assets/items/squash.png");
 }
 
 function setup() {
@@ -31,7 +39,13 @@ function setup() {
 
   inventoryGrid = create2dArray(inventoryGridSize, inventoryGridSize);
   toolBar = [0, 0, 0, 0];
+
+  inventoryGrid[0][0] = "knuckles"
+  inventoryGrid[1][0] = "potato"
+  inventoryGrid[0][1] = "squash"
 }
+
+///////////////////////////////////////////////////////////////////////
 
 function draw() {
   if (gameMode === "menu"){
@@ -49,7 +63,7 @@ function draw() {
   }
 }
 
-
+///////////////////////////////////////////////////////////////////////
 
 function keyPressed(){
   if (gameMode === "game"){
@@ -63,7 +77,13 @@ function windowResized(){
   createCanvas(windowWidth, windowHeight);
 }
 
+function keyPressed(){
+  if (paused === true){
+    pickUp();
+  }
+}
 
+///////////////////////////////////////////////////////////////////////
 
 function gameDrawLoop(){
   rect(mouseX, mouseY, height/12, height/12);
@@ -97,16 +117,26 @@ function displayinventoryGrid(){
   translate(width/2 - height*3/8, (height/2-height/24) - height*3/8);
   for (let y = 0; y < inventoryGridSize; y++){
     for (let x = 0; x < inventoryGridSize; x++){
-      if (inventoryGrid[y][x] === 0){
-        noStroke()
-        fill("brown")
+      imageMode(CORNER);
+      image(itemFrame, x*inventoryScalar, y*inventoryScalar, inventoryScalar, inventoryScalar);
+      imageMode(CENTER);
+      if (inventoryGrid[x][y] === "knuckles"){
+        image(knuckles, x*inventoryScalar+inventoryScalar/2, y*inventoryScalar+inventoryScalar/2, inventoryScalar*4/5, inventoryScalar*4/5);
+      }
+      if (inventoryGrid[x][y] === "potato"){
+        image(potato, x*inventoryScalar+inventoryScalar/2, y*inventoryScalar+inventoryScalar/2, inventoryScalar*4/5, inventoryScalar*4/5);
+      }
+      if (inventoryGrid[x][y] === "squash"){
+        image(squash, x*inventoryScalar+inventoryScalar/2, y*inventoryScalar+inventoryScalar/2, inventoryScalar*4/5, inventoryScalar*4/5);
       }
       else{
         fill(0)
       }
-      rectMode(CORNER);
-      image(itemFrame, x*inventoryScalar, y*inventoryScalar, inventoryScalar, inventoryScalar);
     }
   }
   pop();
+}
+
+function pickUp(){
+  
 }
