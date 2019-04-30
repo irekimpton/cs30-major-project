@@ -29,7 +29,7 @@ function preload(){
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  inventoryGridSize = 8;
+  inventoryGridSize = 4;
   inventoryScalar = height*3/4/inventoryGridSize;
   inventorySize = height-inventoryScalar*4
   gameMode = "game";
@@ -40,9 +40,10 @@ function setup() {
   inventoryGrid = create2dArray(inventoryGridSize, inventoryGridSize);
   toolBar = [0, 0, 0, 0];
 
-  inventoryGrid[0][0] = "knuckles"
-  inventoryGrid[1][0] = "potato"
-  inventoryGrid[0][1] = "squash"
+  inventoryGrid[0][0] = "knuckles";
+  inventoryGrid[1][0] = "potato";
+  inventoryGrid[0][1] = "squash";
+  inventoryHolding = "0";
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -77,11 +78,12 @@ function windowResized(){
   createCanvas(windowWidth, windowHeight);
 }
 
-function keyPressed(){
+function mouseClicked(){
   if (paused === true){
     pickUp();
   }
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -96,7 +98,7 @@ function pausedDrawLoop(){
 
 function gameConstantDrawLoop(){
   rectMode(CENTER);
-  rect(width/2, height - height/24, height*5/12, height/12)
+  rect(width/2, height - height/24, height*5/12, height/12);
 }
 
 
@@ -129,14 +131,25 @@ function displayinventoryGrid(){
       if (inventoryGrid[x][y] === "squash"){
         image(squash, x*inventoryScalar+inventoryScalar/2, y*inventoryScalar+inventoryScalar/2, inventoryScalar*4/5, inventoryScalar*4/5);
       }
-      else{
-        fill(0)
-      }
+
     }
   }
   pop();
 }
 
 function pickUp(){
-  
+  let tempHold;
+  push();
+  translate(width/2 - height*3/8, (height/2-height/24) - height*3/8);
+  let newMouseX = mouseX - width/2 - height*3/8;
+  let newMouseY = mouseY - (height/2-height/24) - height*3/8;
+  let gridSpotX = floor(newMouseX/inventoryScalar + 4);
+  let gridSpotY = floor(newMouseY/inventoryScalar + 4);
+  console.log(gridSpotX, gridSpotY);
+
+  tempHold = inventoryGrid[gridSpotX][gridSpotY];
+  inventoryGrid[gridSpotX][gridSpotY] = inventoryHolding;
+  inventoryHolding = tempHold;
+
+  pop();
 }
