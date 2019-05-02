@@ -19,7 +19,11 @@ let itemFrame;
 let knuckles;
 let potato;
 let squash;
+let kirkStillRight;
 let imageList = [];
+
+
+let kirk;
 
 function preload(){
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
@@ -27,11 +31,24 @@ function preload(){
   potato = loadImage("assets/items/potato.png");
   squash = loadImage("assets/items/squash.png");
 
+  kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
+
   imageList = [knuckles, potato, squash];
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+
+  kirk = {
+    xPos: width/2,
+    yPos: height/2,
+    top: this.yPos - 32,
+    bottom: this.yPos + 32,
+    left: this.xPos - 16,
+    right: this.xPos + 16,
+    facing: "right",
+  }
+
   inventoryGridSize = 4;
   inventoryScalar = height*3/4/inventoryGridSize;
   inventorySize = height-inventoryScalar*4
@@ -48,26 +65,28 @@ function setup() {
   inventoryHolding = 0;
 }
 
-///////////////////////////////////////////////////////////////////////DrawLoops
+/////////////////////////////////////////////////////////////////////// DrawLoops
 
-function draw() {
-  if (gameMode === "menu"){
-  }
-
+function draw(){
   if (gameMode === "game"){
+    if (paused === false){
+    gameUpdateLoop();
+    }
+
+    gameDisplayLoop();
+
     if (paused === true){
       pausedDrawLoop();
     }
-    if (paused === false){
-      background(75);
-      gameDrawLoop();
-    }
+
     gameConstantDrawLoop();
   }
 }
 
-function gameDrawLoop(){
-  rect(mouseX, mouseY, height/12, height/12);
+function gameUpdateLoop(){
+  if (keyIsPressed){
+
+  }
 }
 
 function pausedDrawLoop(){
@@ -77,6 +96,12 @@ function pausedDrawLoop(){
     imageMode(CENTER);
     image(imageList[inventoryHolding-1], mouseX, mouseY, inventoryScalar, inventoryScalar);
   }
+}
+
+function gameDisplayLoop(){
+  background(75);
+  imageMode(CENTER);
+  image(kirkStillRight, kirk.xPos, kirk.yPos, height/12, height/6);
 }
 
 function gameConstantDrawLoop(){
