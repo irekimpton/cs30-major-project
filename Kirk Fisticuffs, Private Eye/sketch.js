@@ -22,18 +22,17 @@ let squash;
 let kirkStillRight;
 let imageList = [];
 
-
 let kirk;
 
 function preload(){
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
+
   knuckles = loadImage("assets/items/knuckles.png");
-  potato = loadImage("assets/items/potato.png");
-  squash = loadImage("assets/items/squash.png");
+  laserCannon = loadImage("assets/items/laserCannon.png");
 
   kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
 
-  imageList = [knuckles, potato, squash];
+  imageList = [knuckles, laserCannon];
 }
 
 function setup() {
@@ -61,7 +60,6 @@ function setup() {
 
   inventoryGrid[0][0] = 1;
   inventoryGrid[1][0] = 2;
-  inventoryGrid[0][1] = 3;
   inventoryHolding = 0;
 }
 
@@ -84,8 +82,22 @@ function draw(){
 }
 
 function gameUpdateLoop(){
-  if (keyIsPressed){
-
+  if (paused === false){
+    if (keyIsDown(87)){
+      kirk.yPos -= 5;
+    }
+  
+    if (keyIsDown(83)){
+      kirk.yPos += 5;
+    }
+  
+    if (keyIsDown(65)){
+      kirk.xPos -= 5;
+    }
+  
+    if (keyIsDown(68)){
+      kirk.xPos += 5;
+    }
   }
 }
 
@@ -94,7 +106,9 @@ function pausedDrawLoop(){
   displayinventoryGrid();
   if (inventoryHolding !== 0){
     imageMode(CENTER);
-    image(imageList[inventoryHolding-1], mouseX, mouseY, inventoryScalar, inventoryScalar);
+    if (inventoryHolding < inventoryGridSize){
+      image(imageList[inventoryHolding-1], mouseX, mouseY, inventoryScalar, inventoryScalar);
+    }
   }
 }
 
@@ -128,7 +142,6 @@ function mouseClicked(){
     pickUp();
   }
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -169,9 +182,11 @@ function pickUp(){
   let gridSpotY = floor(newMouseY/inventoryScalar + inventoryGridSize);
   console.log(gridSpotX, gridSpotY);
 
-  tempHold = inventoryGrid[gridSpotX][gridSpotY];
-  inventoryGrid[gridSpotX][gridSpotY] = inventoryHolding;
-  inventoryHolding = tempHold;
+  if (gridSpotX >= 0 && gridSpotY >= 0 && gridSpotX < inventoryGridSize && gridSpotY < inventoryGridSize){
+    tempHold = inventoryGrid[gridSpotX][gridSpotY];
+    inventoryGrid[gridSpotX][gridSpotY] = inventoryHolding;
+    inventoryHolding = tempHold;
+  }
 
   pop();
 }
