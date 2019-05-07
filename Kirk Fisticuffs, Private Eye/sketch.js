@@ -12,7 +12,6 @@ let inventorySize;
 let inventoryGridSize;
 let inventoryGrid;
 let inventoryScalar;
-let toolBar = [0, 0, 0, 0];;
 let inventoryHolding;
 
 let itemFrame;
@@ -49,8 +48,8 @@ function setup() {
   }
 
   inventoryGridSize = 4;
-  inventoryScalar = height*3/4/inventoryGridSize;
-  inventorySize = height-inventoryScalar*4
+  inventoryScalar = height*3/4*inventoryGridSize);
+  inventorySize = inventoryScalar*inventoryGridSize
   gameMode = "game";
   paused = false;
 
@@ -76,8 +75,6 @@ function draw(){
     if (paused === true){
       pausedDrawLoop();
     }
-
-    gameConstantDrawLoop();
   }
 }
 
@@ -102,7 +99,6 @@ function gameUpdateLoop(){
 }
 
 function pausedDrawLoop(){
-  rect(width/2, (height/2-height/24), height*3/4, height*3/4);
   displayinventoryGrid();
   if (inventoryHolding !== 0){
     imageMode(CENTER);
@@ -116,11 +112,6 @@ function gameDisplayLoop(){
   background(75);
   imageMode(CENTER);
   image(kirkStillRight, kirk.xPos, kirk.yPos, height/12, height/6);
-}
-
-function gameConstantDrawLoop(){
-  rectMode(CENTER);
-  rect(width/2, height - height/24, height/3, height/12);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -158,7 +149,7 @@ function create2dArray(rows, columns){
 
 function displayinventoryGrid(){
   push();
-  translate(width/2 - height*3/8, (height/2-height/24) - height*3/8);
+  translate((width - inventorySize)/2, (height - inventorySize)/2);
   for (let y = 0; y < inventoryGridSize; y++){
     for (let x = 0; x < inventoryGridSize; x++){
       imageMode(CORNER);
@@ -175,11 +166,11 @@ function displayinventoryGrid(){
 function pickUp(){
   let tempHold;
   push();
-  translate(width/2 - height*3/8, (height/2-height/24) - height*3/8);
-  let newMouseX = mouseX - width/2 - height*3/8;
-  let newMouseY = mouseY - (height/2-height/24) - height*3/8;
-  let gridSpotX = floor(newMouseX/inventoryScalar + inventoryGridSize);
-  let gridSpotY = floor(newMouseY/inventoryScalar + inventoryGridSize);
+  translate((width - inventorySize)/2, (height - inventorySize)/2);
+  let newMouseX = mouseX - (width - inventorySize)/2;
+  let newMouseY = mouseY - (height - inventorySize)/2;
+  let gridSpotX = floor(newMouseX/inventoryScalar);
+  let gridSpotY = floor(newMouseY/inventoryScalar);
   console.log(gridSpotX, gridSpotY);
 
   if (gridSpotX >= 0 && gridSpotY >= 0 && gridSpotX < inventoryGridSize && gridSpotY < inventoryGridSize){
