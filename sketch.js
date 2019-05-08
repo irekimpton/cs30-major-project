@@ -15,6 +15,7 @@ let inventoryScalar;
 let inventoryHolding;
 
 let itemFrame;
+let otherItemFrame
 let knuckles;
 let potato;
 let squash;
@@ -25,6 +26,7 @@ let kirk;
 
 function preload(){
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
+  otherItemFrame = loadImage("assets/miscSprites/otherItemFrame.png");
 
   knuckles = loadImage("assets/items/knuckles.png");
   laserCannon = loadImage("assets/items/laserCannon.png");
@@ -45,10 +47,11 @@ function setup() {
     left: this.xPos - 16,
     right: this.xPos + 16,
     facing: "right",
+    speed: 5,
   }
 
   inventoryGridSize = 4;
-  inventoryScalar = height*3/4*inventoryGridSize);
+  inventoryScalar = height*3/4/inventoryGridSize;
   inventorySize = inventoryScalar*inventoryGridSize
   gameMode = "game";
   paused = false;
@@ -80,21 +83,7 @@ function draw(){
 
 function gameUpdateLoop(){
   if (paused === false){
-    if (keyIsDown(87)){
-      kirk.yPos -= 5;
-    }
-  
-    if (keyIsDown(83)){
-      kirk.yPos += 5;
-    }
-  
-    if (keyIsDown(65)){
-      kirk.xPos -= 5;
-    }
-  
-    if (keyIsDown(68)){
-      kirk.xPos += 5;
-    }
+    moveKirk();
   }
 }
 
@@ -153,7 +142,12 @@ function displayinventoryGrid(){
   for (let y = 0; y < inventoryGridSize; y++){
     for (let x = 0; x < inventoryGridSize; x++){
       imageMode(CORNER);
-      image(itemFrame, x*inventoryScalar, y*inventoryScalar, inventoryScalar, inventoryScalar);
+      if (x === 0 && y === inventoryGridSize-1){
+        image(otherItemFrame, x*inventoryScalar, y*inventoryScalar, inventoryScalar, inventoryScalar);
+      }
+      else{
+        image(itemFrame, x*inventoryScalar, y*inventoryScalar, inventoryScalar, inventoryScalar);
+      }
       imageMode(CENTER);
       if (inventoryGrid[x][y] !== 0){
         image(imageList[inventoryGrid[x][y]-1], x*inventoryScalar+inventoryScalar/2, y*inventoryScalar+inventoryScalar/2, inventoryScalar*4/5, inventoryScalar*4/5);
@@ -180,4 +174,39 @@ function pickUp(){
   }
 
   pop();
+}
+
+function moveKirk(){
+  if (keyIsDown(87) && upDetection()){
+    kirk.yPos -= kirk.speed;
+  }
+
+  if (keyIsDown(83) && dpwnDetection()){
+    kirk.yPos += kirk.speed;
+  }
+
+  if (keyIsDown(65) && leftDetection()){
+    kirk.xPos -= kirk.speed;
+  }
+
+  if (keyIsDown(68) && rightDetection()){
+    kirk.xPos += kirk.speed;
+  }
+}
+
+function upDetection(){
+  if (kirk.left >
+
+}
+
+function downDetection(){
+  
+}
+
+function leftDetection(){
+  
+}
+
+function rightDetection(){
+  
 }
