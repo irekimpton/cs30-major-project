@@ -177,36 +177,19 @@ function pickUp(){
 }
 
 function moveKirk(){
-  if (keyIsDown(87) && upDetection()){
+  if (keyIsDown(87)){
     kirk.yPos -= kirk.speed;
   }
 
-  if (keyIsDown(83) && dpwnDetection()){
+  if (keyIsDown(83)){
     kirk.yPos += kirk.speed;
   }
 
-  if (keyIsDown(65) && leftDetection()){
+  if (keyIsDown(65)){
     kirk.xPos -= kirk.speed;
   }
 
-  if (keyIsDown(68) && rightDetection()){
+  if (keyIsDown(68)){
     kirk.xPos += kirk.speed;
   }
-}
-
-function upDetection(){
-  if (kirk.left >
-
-}
-
-function downDetection(){
-  
-}
-
-function leftDetection(){
-  
-}
-
-function rightDetection(){
-  
 }
