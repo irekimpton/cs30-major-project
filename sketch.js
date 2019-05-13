@@ -24,6 +24,7 @@ let imageList = [];
 
 let kirk;
 
+
 function preload(){
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
   otherItemFrame = loadImage("assets/miscSprites/otherItemFrame.png");
@@ -193,3 +194,20 @@ function moveKirk(){
     kirk.xPos += kirk.speed;
   }
 }
+
+function checkUp();
+
+function checkDown();
+
+function checkLeft();
+
+function checkRight();
+
+///////////////////////////////////////////////////////// Classes
+
+class Wall{
+  constructor(xPos, yPos){
+    this.xPos = xPos;
+    this.yPos = yPos;
+  }
+} 
