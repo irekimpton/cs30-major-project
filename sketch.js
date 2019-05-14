@@ -209,5 +209,6 @@ class Wall{
   constructor(xPos, yPos){
     this.xPos = xPos;
     this.yPos = yPos;
+    this.image = 
   }
 } 
