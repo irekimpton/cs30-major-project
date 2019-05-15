@@ -14,11 +14,12 @@ let inventoryGrid;
 let inventoryScalar;
 let inventoryHolding;
 
+let officeLevel
+
 let itemFrame;
 let otherItemFrame
 let knuckles;
-let potato;
-let squash;
+let bookcase;
 let kirkStillRight;
 let imageList = [];
 
@@ -26,11 +27,17 @@ let kirk;
 
 
 function preload(){
+  ///// LEVELS
+  levelToLoad = "assets/levels/officeLevel.txt";
+
+  ///// IMAGES
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
   otherItemFrame = loadImage("assets/miscSprites/otherItemFrame.png");
 
   knuckles = loadImage("assets/items/knuckles.png");
   laserCannon = loadImage("assets/items/laserCannon.png");
+
+  bookcase = loadImage("assets/setPieces/bookacase.png");
 
   kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
 
@@ -209,6 +216,6 @@ class Wall{
   constructor(xPos, yPos){
     this.xPos = xPos;
     this.yPos = yPos;
-    this.image = 
+    this.image = bookcase
   }
 } 
