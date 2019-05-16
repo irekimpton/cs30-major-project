@@ -14,7 +14,7 @@ let inventoryGrid;
 let inventoryScalar;
 let inventoryHolding;
 
-let officeLevel
+let officeLevel;
 
 let itemFrame;
 let otherItemFrame
@@ -37,7 +37,7 @@ function preload(){
   knuckles = loadImage("assets/items/knuckles.png");
   laserCannon = loadImage("assets/items/laserCannon.png");
 
-  bookcase = loadImage("assets/setPieces/bookacase.png");
+  bookcase = loadImage("assets/setPieces/bookcase.png");
 
   kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
 
@@ -202,13 +202,21 @@ function moveKirk(){
   }
 }
 
-function checkUp();
+function checkUp(){
 
-function checkDown();
+}
 
-function checkLeft();
+function checkDown(){
 
-function checkRight();
+}
+
+function checkLeft(){
+
+}
+
+function checkRight(){
+
+}
 
 ///////////////////////////////////////////////////////// Classes
 
