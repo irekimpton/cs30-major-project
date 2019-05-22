@@ -13,22 +13,33 @@ let inventoryGridSize;
 let inventoryGrid;
 let inventoryScalar;
 let inventoryHolding;
+let gameScalar;
 
 let officeLevel;
+let officeLines;
+let officeTiles;
+
+let bookcase;
+let wall;
+let door;
+
+let walls;
+let bookcases;
+let doors;
 
 let itemFrame;
 let otherItemFrame
 let knuckles;
-let bookcase;
 let kirkStillRight;
-let imageList = [];
+let imageList;
 
 let kirk;
 
 
 function preload(){
   ///// LEVELS
-  levelToLoad = "assets/levels/officeLevel.txt";
+  officeLevel = "assets/levels/officeLevel.txt";
+  officeLines = loadStrings(officeLevel);
 
   ///// IMAGES
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
@@ -38,6 +49,7 @@ function preload(){
   laserCannon = loadImage("assets/items/laserCannon.png");
 
   bookcase = loadImage("assets/setPieces/bookcase.png");
+  wall = loadImage("assets/setPieces/wall.png");
 
   kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
 
@@ -46,9 +58,20 @@ function preload(){
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  gameScalar = height/12;
+
+  officeTiles = create2dArray(12, 12);
+
+  for (let y = 0; y < 12; y++) {
+    for (let x = 0; x < 12; x++) {
+      let tileType = officeLines[x][y];
+      officeTiles[x][y] = tileType;
+    }
+  }
+  console.log(officeTiles)
 
   kirk = {
-    xPos: width/2,
+    xPos: height/2,
     yPos: height/2,
     top: this.yPos - 32,
     bottom: this.yPos + 32,
@@ -218,12 +241,44 @@ function checkRight(){
 
 }
 
+function assignClasses(){
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (officeTiles[x][y] === "W"){
+        officeTiles[x][y] = new Wall(x*gameScalar, y*gameScalar);
+      }
+      if (officeTiles[x][y] === "B"){
+        officeTiles[x][y] = new Bookcase(x*gameScalar, y*gameScalar);
+      }
+      if (officeTiles[x][y] === "D"){
+        officeTiles[x][y] = new Door(x*gameScalar, y*gameScalar);
+      }
+    }
+  }
+}
+
 ///////////////////////////////////////////////////////// Classes
 
 class Wall{
   constructor(xPos, yPos){
     this.xPos = xPos;
     this.yPos = yPos;
-    this.image = bookcase
+    this.image = wall;
   }
-} 
+}
+
+class Bookcase{
+  constructor(xPos, yPos){
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.image = bookcase;
+  }
+}
+
+class Door{
+  constructor(xPos, yPos){
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.image = Door;
+  }
+}
