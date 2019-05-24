@@ -68,7 +68,8 @@ function setup() {
       officeTiles[x][y] = tileType;
     }
   }
-  console.log(officeTiles)
+  assignClasses();
+  console.log(officeTiles);
 
   kirk = {
     xPos: height/2,
@@ -101,7 +102,7 @@ function setup() {
 function draw(){
   if (gameMode === "game"){
     if (paused === false){
-    gameUpdateLoop();
+      gameUpdateLoop();
     }
 
     gameDisplayLoop();
@@ -132,6 +133,7 @@ function gameDisplayLoop(){
   background(75);
   imageMode(CENTER);
   image(kirkStillRight, kirk.xPos, kirk.yPos, height/12, height/6);
+  displayStuff();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -257,6 +259,22 @@ function assignClasses(){
   }
 }
 
+function displayStuff(){
+  for (let i = 0; i < officeTiles.length; i++){
+    for (let j = 0; j < officeTiles.length; j++){
+      if (officeTiles[i][j] === "Wall"){
+        officeTiles[i][j].displaySelf();
+      }
+      if (officeTiles[i][j] === "Bookcase"){
+        officeTiles[i][j].displaySelf();
+      }
+      if (officeTiles[i][j] === "Door"){
+        officeTiles[i][j].displaySelf();
+      }
+    }
+  }
+}
+
 ///////////////////////////////////////////////////////// Classes
 
 class Wall{
@@ -264,6 +282,10 @@ class Wall{
     this.xPos = xPos;
     this.yPos = yPos;
     this.image = wall;
+  }
+
+  displaySelf(){
+    image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
   }
 }
 
@@ -273,6 +295,10 @@ class Bookcase{
     this.yPos = yPos;
     this.image = bookcase;
   }
+
+  displaySelf(){
+    image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
+  }
 }
 
 class Door{
@@ -280,5 +306,9 @@ class Door{
     this.xPos = xPos;
     this.yPos = yPos;
     this.image = Door;
+  }
+
+  displaySelf(){
+    image(this.image, this.xPos, this.yPos, gameScalar, 2*gameScalar);
   }
 }
