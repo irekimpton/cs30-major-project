@@ -50,6 +50,7 @@ function preload(){
 
   bookcase = loadImage("assets/setPieces/bookcase.png");
   wall = loadImage("assets/setPieces/wall.png");
+  door = loadImage("assets/setPieces/door.png");
 
   kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
 
@@ -104,7 +105,6 @@ function draw(){
     if (paused === false){
       gameUpdateLoop();
     }
-
     gameDisplayLoop();
 
     if (paused === true){
@@ -133,6 +133,7 @@ function gameDisplayLoop(){
   background(75);
   imageMode(CENTER);
   image(kirkStillRight, kirk.xPos, kirk.yPos, height/12, height/6);
+  imageMode(CORNER);
   displayStuff();
 }
 
@@ -210,7 +211,7 @@ function pickUp(){
 }
 
 function moveKirk(){
-  if (keyIsDown(87)){
+  if (keyIsDown(87) && checkUp()){
     kirk.yPos -= kirk.speed;
   }
 
@@ -228,7 +229,13 @@ function moveKirk(){
 }
 
 function checkUp(){
-
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (officeTiles[x][y] != "E"){
+        return !(officeTiles[x][y].yPos < kirk.bottom && officeTiles[x][y].yPos + gameScalar > kirk.top);
+      }
+    }
+  }
 }
 
 function checkDown(){
@@ -246,14 +253,14 @@ function checkRight(){
 function assignClasses(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (officeTiles[x][y] === "W"){
-        officeTiles[x][y] = new Wall(x*gameScalar, y*gameScalar);
+      if (officeTiles[y][x] === "W"){
+        officeTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Wall", wall);
       }
-      if (officeTiles[x][y] === "B"){
-        officeTiles[x][y] = new Bookcase(x*gameScalar, y*gameScalar);
+      else if (officeTiles[y][x] === "B"){
+        officeTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Bookcase", bookcase);
       }
-      if (officeTiles[x][y] === "D"){
-        officeTiles[x][y] = new Door(x*gameScalar, y*gameScalar);
+      else if (officeTiles[y][x] === "D"){
+        officeTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Door", door);
       }
     }
   }
@@ -262,14 +269,8 @@ function assignClasses(){
 function displayStuff(){
   for (let i = 0; i < officeTiles.length; i++){
     for (let j = 0; j < officeTiles.length; j++){
-      if (officeTiles[i][j] === "Wall"){
-        officeTiles[i][j].displaySelf();
-      }
-      if (officeTiles[i][j] === "Bookcase"){
-        officeTiles[i][j].displaySelf();
-      }
-      if (officeTiles[i][j] === "Door"){
-        officeTiles[i][j].displaySelf();
+      if (officeTiles[j][i].type === "Wall" || officeTiles[j][i].type === "Bookcase" || officeTiles[j][i].type === "Door"){
+        officeTiles[j][i].displaySelf();
       }
     }
   }
@@ -277,38 +278,20 @@ function displayStuff(){
 
 ///////////////////////////////////////////////////////// Classes
 
-class Wall{
-  constructor(xPos, yPos){
+class SetPiece{
+  constructor(xPos, yPos, type, image){
+    this.type = type;
+    this.image = image;
     this.xPos = xPos;
     this.yPos = yPos;
-    this.image = wall;
   }
 
   displaySelf(){
-    image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
-  }
-}
-
-class Bookcase{
-  constructor(xPos, yPos){
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.image = bookcase;
-  }
-
-  displaySelf(){
-    image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
-  }
-}
-
-class Door{
-  constructor(xPos, yPos){
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.image = Door;
-  }
-
-  displaySelf(){
-    image(this.image, this.xPos, this.yPos, gameScalar, 2*gameScalar);
+    if (this.type !== "Door") {
+      image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
+    }
+    else {
+      image(this.image, this.xPos, this.yPos, gameScalar, 2*gameScalar);
+    }
   }
 }
