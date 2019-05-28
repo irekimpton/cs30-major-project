@@ -53,6 +53,7 @@ function preload(){
   door = loadImage("assets/setPieces/door.png");
 
   kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
+  kirkStillLeft = loadImage("assets/kirk/kirkStillLeft.png");
 
   imageList = [knuckles, laserCannon];
 }
@@ -73,13 +74,9 @@ function setup() {
   console.log(officeTiles);
 
   kirk = {
+    image: kirkStillRight,
     xPos: height/2,
     yPos: height/2,
-    top: this.yPos - 32,
-    bottom: this.yPos + 32,
-    left: this.xPos - 16,
-    right: this.xPos + 16,
-    facing: "right",
     speed: 5,
   }
 
@@ -132,7 +129,7 @@ function pausedDrawLoop(){
 function gameDisplayLoop(){
   background(75);
   imageMode(CENTER);
-  image(kirkStillRight, kirk.xPos, kirk.yPos, height/12, height/6);
+  image(kirk.image, kirk.xPos, kirk.yPos, height/12, height/6);
   imageMode(CORNER);
   displayStuff();
 }
@@ -211,43 +208,48 @@ function pickUp(){
 }
 
 function moveKirk(){
-  if (keyIsDown(87) && checkUp()){
+  if (keyIsDown(87)){ //UP
     kirk.yPos -= kirk.speed;
+    if (invalidMove()){
+      kirk.yPos += kirk.speed;
+    }
   }
 
-  if (keyIsDown(83)){
+  if (keyIsDown(83)){ //DOWN
     kirk.yPos += kirk.speed;
+    if (invalidMove()){
+      kirk.yPos -= kirk.speed;
+    }
   }
 
-  if (keyIsDown(65)){
+  if (keyIsDown(65)){ //RIGHT
     kirk.xPos -= kirk.speed;
+    if (invalidMove()){
+      kirk.xPos += kirk.speed;
+    }
+    kirk.image = kirkStillLeft
   }
 
-  if (keyIsDown(68)){
+  if (keyIsDown(68)){ //LEFT
     kirk.xPos += kirk.speed;
+    if (invalidMove()){
+      kirk.xPos -= kirk.speed;
+    }
+    kirk.image = kirkStillRight
   }
 }
 
-function checkUp(){
+function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
       if (officeTiles[x][y] != "E"){
-        return !(officeTiles[x][y].yPos < kirk.bottom && officeTiles[x][y].yPos + gameScalar > kirk.top);
+        if ((kirk.xPos + gameScalar/2 > officeTiles[x][y].xPos && kirk.xPos - gameScalar/2 < officeTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar > officeTiles[x][y].yPos && kirk.yPos - gameScalar < officeTiles[x][y].yPos + gameScalar)){
+          return true
+        }
       }
     }
   }
-}
-
-function checkDown(){
-
-}
-
-function checkLeft(){
-
-}
-
-function checkRight(){
-
+  return false
 }
 
 function assignClasses(){
