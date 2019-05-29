@@ -75,8 +75,8 @@ function setup() {
 
   kirk = {
     image: kirkStillRight,
-    xPos: height/2,
-    yPos: height/2,
+    xPos: height/2-gameScalar/2,
+    yPos: height/2-gameScalar,
     speed: 5,
   }
 
@@ -128,8 +128,8 @@ function pausedDrawLoop(){
 
 function gameDisplayLoop(){
   background(75);
-  imageMode(CENTER);
-  image(kirk.image, kirk.xPos, kirk.yPos, height/12, height/6);
+  imageMode(CORNER);
+  image(kirk.image, kirk.xPos, kirk.yPos, gameScalar, 2*gameScalar);
   imageMode(CORNER);
   displayStuff();
 }
@@ -209,31 +209,39 @@ function pickUp(){
 
 function moveKirk(){
   if (keyIsDown(87)){ //UP
-    kirk.yPos -= kirk.speed;
-    if (invalidMove()){
-      kirk.yPos += kirk.speed;
+    for(let i = 0; i < kirk.speed; i++){
+      kirk.yPos -= 1;
+      if (invalidMove()){
+        kirk.yPos += 1;
+      }
     }
   }
 
   if (keyIsDown(83)){ //DOWN
-    kirk.yPos += kirk.speed;
-    if (invalidMove()){
-      kirk.yPos -= kirk.speed;
+    for(let i = 0; i < kirk.speed; i++){
+      kirk.yPos += 1;
+      if (invalidMove()){
+        kirk.yPos -= 1;
+      }
     }
   }
 
   if (keyIsDown(65)){ //RIGHT
-    kirk.xPos -= kirk.speed;
-    if (invalidMove()){
-      kirk.xPos += kirk.speed;
+    for(let i = 0; i < kirk.speed; i++){
+      kirk.xPos -= 1;
+      if (invalidMove()){
+        kirk.xPos += 1;
+      }
     }
     kirk.image = kirkStillLeft
   }
 
   if (keyIsDown(68)){ //LEFT
-    kirk.xPos += kirk.speed;
-    if (invalidMove()){
-      kirk.xPos -= kirk.speed;
+    for(let i = 0; i < kirk.speed; i++){
+      kirk.xPos += 1;
+      if (invalidMove()){
+        kirk.xPos -= 1;
+      }
     }
     kirk.image = kirkStillRight
   }
@@ -243,7 +251,7 @@ function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
       if (officeTiles[x][y] != "E"){
-        if ((kirk.xPos + gameScalar/2 > officeTiles[x][y].xPos && kirk.xPos - gameScalar/2 < officeTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar > officeTiles[x][y].yPos && kirk.yPos - gameScalar < officeTiles[x][y].yPos + gameScalar)){
+        if ((kirk.xPos + gameScalar > officeTiles[x][y].xPos && kirk.xPos + gameScalar < officeTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > officeTiles[x][y].yPos && kirk.yPos < officeTiles[x][y].yPos + gameScalar)){
           return true
         }
       }
