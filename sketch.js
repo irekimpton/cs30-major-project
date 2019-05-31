@@ -17,23 +17,21 @@ let gameScalar;
 
 let officeLevel;
 let officeLines;
-let officeTiles;
+let gridTiles;
 
 let bookcase;
 let wall;
 let door;
 
-let walls;
-let bookcases;
-let doors;
-
 let itemFrame;
 let otherItemFrame
 let knuckles;
-let kirkStillRight;
+let kirkRight;
 let imageList;
 
 let kirk;
+
+let doorToStreet;
 
 
 function preload(){
@@ -52,8 +50,8 @@ function preload(){
   wall = loadImage("assets/setPieces/wall.png");
   door = loadImage("assets/setPieces/door.png");
 
-  kirkStillRight = loadImage("assets/kirk/kirkStillRight.png");
-  kirkStillLeft = loadImage("assets/kirk/kirkStillLeft.png");
+  kirkRight = loadImage("assets/kirk/kirkRight.png");
+  kirkLeft = loadImage("assets/kirk/kirkLeft.png");
 
   imageList = [knuckles, laserCannon];
 }
@@ -62,23 +60,31 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   gameScalar = height/12;
 
-  officeTiles = create2dArray(12, 12);
+  gridTiles = create2dArray(12, 12);
 
   for (let y = 0; y < 12; y++) {
     for (let x = 0; x < 12; x++) {
       let tileType = officeLines[x][y];
-      officeTiles[x][y] = tileType;
+      gridTiles[x][y] = tileType;
     }
   }
-  assignClasses();
-  console.log(officeTiles);
+  console.log(gridTiles);
 
   kirk = {
-    image: kirkStillRight,
+    image: kirkRight,
     xPos: height/2-gameScalar/2,
     yPos: height/2-gameScalar,
     speed: 5,
   }
+
+  doorToStreet = {
+    active: false,
+    xPos: 0,
+    yPos: 0,
+    image: door,
+  }
+
+  assignLevel();
 
   inventoryGridSize = 4;
   inventoryScalar = height*3/4/inventoryGridSize;
@@ -130,7 +136,6 @@ function gameDisplayLoop(){
   background(75);
   imageMode(CORNER);
   image(kirk.image, kirk.xPos, kirk.yPos, gameScalar, 2*gameScalar);
-  imageMode(CORNER);
   displayStuff();
 }
 
@@ -233,7 +238,7 @@ function moveKirk(){
         kirk.xPos += 1;
       }
     }
-    kirk.image = kirkStillLeft
+    kirk.image = kirkLeft
   }
 
   if (keyIsDown(68)){ //LEFT
@@ -243,15 +248,15 @@ function moveKirk(){
         kirk.xPos -= 1;
       }
     }
-    kirk.image = kirkStillRight
+    kirk.image = kirkRight
   }
 }
 
 function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (officeTiles[x][y] != "E"){
-        if ((kirk.xPos + gameScalar > officeTiles[x][y].xPos && kirk.xPos + gameScalar < officeTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > officeTiles[x][y].yPos && kirk.yPos < officeTiles[x][y].yPos + gameScalar)){
+      if (gridTiles[x][y] !== "E" && gridTiles[x][y] !== doorToStreet){
+        if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos + gameScalar < gridTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
           return true
         }
       }
@@ -260,27 +265,33 @@ function invalidMove(){
   return false
 }
 
-function assignClasses(){
+function assignLevel(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (officeTiles[y][x] === "W"){
-        officeTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Wall", wall);
+      if (gridTiles[y][x] === "W"){
+        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Wall", wall);
       }
-      else if (officeTiles[y][x] === "B"){
-        officeTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Bookcase", bookcase);
+      else if (gridTiles[y][x] === "B"){
+        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Bookcase", bookcase);
       }
-      else if (officeTiles[y][x] === "D"){
-        officeTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Door", door);
+      else if(gridTiles[y][x] === "1"){
+        gridTiles[y][x] = doorToStreet;
+        doorToStreet.xPos = x*gameScalar;
+        doorToStreet.yPos = y*gameScalar;
+        doorToStreet.active = true;
       }
     }
   }
 }
 
 function displayStuff(){
-  for (let i = 0; i < officeTiles.length; i++){
-    for (let j = 0; j < officeTiles.length; j++){
-      if (officeTiles[j][i].type === "Wall" || officeTiles[j][i].type === "Bookcase" || officeTiles[j][i].type === "Door"){
-        officeTiles[j][i].displaySelf();
+  for (let i = 0; i < gridTiles.length; i++){
+    for (let j = 0; j < gridTiles.length; j++){
+      if (gridTiles[j][i].type === "Wall" || gridTiles[j][i].type === "Bookcase"){
+        gridTiles[j][i].displaySelf();
+      }
+      if (gridTiles[j][i] === doorToStreet){
+        image(door, doorToStreet.xPos, doorToStreet.yPos, gameScalar, 2*gameScalar);
       }
     }
   }
@@ -297,11 +308,6 @@ class SetPiece{
   }
 
   displaySelf(){
-    if (this.type !== "Door") {
-      image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
-    }
-    else {
-      image(this.image, this.xPos, this.yPos, gameScalar, 2*gameScalar);
-    }
+    image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
   }
 }
