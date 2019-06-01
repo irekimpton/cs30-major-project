@@ -31,9 +31,6 @@ let imageList;
 
 let kirk;
 
-let doorToStreet;
-
-
 function preload(){
   ///// LEVELS
   officeLevel = "assets/levels/officeLevel.txt";
@@ -75,13 +72,6 @@ function setup() {
     xPos: height/2-gameScalar/2,
     yPos: height/2-gameScalar,
     speed: 5,
-  }
-
-  doorToStreet = {
-    active: false,
-    xPos: 0,
-    yPos: 0,
-    image: door,
   }
 
   assignLevel();
@@ -255,7 +245,7 @@ function moveKirk(){
 function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (gridTiles[x][y] !== "E" && gridTiles[x][y] !== doorToStreet){
+      if (gridTiles[x][y] !== "E" && gridTiles[x][y] !== "Door"){
         if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos + gameScalar < gridTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
           return true
         }
@@ -274,11 +264,8 @@ function assignLevel(){
       else if (gridTiles[y][x] === "B"){
         gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Bookcase", bookcase);
       }
-      else if(gridTiles[y][x] === "1"){
-        gridTiles[y][x] = doorToStreet;
-        doorToStreet.xPos = x*gameScalar;
-        doorToStreet.yPos = y*gameScalar;
-        doorToStreet.active = true;
+      else if (gridTiles[y][x] === "1"){
+        gridTiles[y][x] = new Door(x*gameScalar, y*gameScalar, "Door", door, "alley");
       }
     }
   }
@@ -287,11 +274,8 @@ function assignLevel(){
 function displayStuff(){
   for (let i = 0; i < gridTiles.length; i++){
     for (let j = 0; j < gridTiles.length; j++){
-      if (gridTiles[j][i].type === "Wall" || gridTiles[j][i].type === "Bookcase"){
+      if (gridTiles[j][i].type === "Wall" || gridTiles[j][i].type === "Bookcase" || gridTiles[j][i].type === "Door"){
         gridTiles[j][i].displaySelf();
-      }
-      if (gridTiles[j][i] === doorToStreet){
-        image(door, doorToStreet.xPos, doorToStreet.yPos, gameScalar, 2*gameScalar);
       }
     }
   }
@@ -309,5 +293,19 @@ class SetPiece{
 
   displaySelf(){
     image(this.image, this.xPos, this.yPos, gameScalar, gameScalar);
+  }
+}
+
+class Door{
+  constructor(xPos, yPos, type, image, destination){
+    this.type = type
+    this.image = image;
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.destination = destination;
+  }
+
+  displaySelf(){
+    image(this.image, this.xPos, this.yPos, gameScalar, 2*gameScalar);
   }
 }
