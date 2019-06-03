@@ -21,7 +21,8 @@ let gridTiles;
 
 let bookcase;
 let wall;
-let door;
+let doorRight;
+let doorLeft;
 
 let itemFrame;
 let otherItemFrame
@@ -45,7 +46,8 @@ function preload(){
 
   bookcase = loadImage("assets/setPieces/bookcase.png");
   wall = loadImage("assets/setPieces/wall.png");
-  door = loadImage("assets/setPieces/door.png");
+  doorRight = loadImage("assets/setPieces/doorRight.png");
+  doorLeft = loadImage("assets/setPieces/doorLeft.png");
 
   kirkRight = loadImage("assets/kirk/kirkRight.png");
   kirkLeft = loadImage("assets/kirk/kirkLeft.png");
@@ -55,7 +57,7 @@ function preload(){
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  gameScalar = height/12;
+  gameScalar = floor(height/12);
 
   gridTiles = create2dArray(12, 12);
 
@@ -69,8 +71,8 @@ function setup() {
 
   kirk = {
     image: kirkRight,
-    xPos: height/2-gameScalar/2,
-    yPos: height/2-gameScalar,
+    xPos: floor(height/2-gameScalar/2),
+    yPos: floor(height/2-gameScalar),
     speed: 5,
   }
 
@@ -206,6 +208,7 @@ function moveKirk(){
   if (keyIsDown(87)){ //UP
     for(let i = 0; i < kirk.speed; i++){
       kirk.yPos -= 1;
+      floor(kirk.yPos);
       if (invalidMove()){
         kirk.yPos += 1;
       }
@@ -215,15 +218,17 @@ function moveKirk(){
   if (keyIsDown(83)){ //DOWN
     for(let i = 0; i < kirk.speed; i++){
       kirk.yPos += 1;
+      floor(kirk.yPos);
       if (invalidMove()){
         kirk.yPos -= 1;
       }
     }
   }
 
-  if (keyIsDown(65)){ //RIGHT
+  if (keyIsDown(65)){ //LEFT
     for(let i = 0; i < kirk.speed; i++){
       kirk.xPos -= 1;
+      floor(kirk.xPos);
       if (invalidMove()){
         kirk.xPos += 1;
       }
@@ -231,9 +236,10 @@ function moveKirk(){
     kirk.image = kirkLeft
   }
 
-  if (keyIsDown(68)){ //LEFT
+  if (keyIsDown(68)){ //RIGHT
     for(let i = 0; i < kirk.speed; i++){
       kirk.xPos += 1;
+      floor(kirk.xPos);
       if (invalidMove()){
         kirk.xPos -= 1;
       }
@@ -245,9 +251,14 @@ function moveKirk(){
 function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (gridTiles[x][y] !== "E" && gridTiles[x][y] !== "Door"){
-        if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos + gameScalar < gridTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
-          return true
+      if (gridTiles[x][y] !== "E"){
+        if (gridTiles[x][y].type === "wall" || gridTiles[x][y].type === "bookcase"){
+          if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos + gameScalar < gridTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
+            return true
+          }
+        }
+        if (gridTiles[x][y].type === "door"){
+          //CHECK IF ITS IN THE DOOR ISH
         }
       }
     }
@@ -259,13 +270,13 @@ function assignLevel(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
       if (gridTiles[y][x] === "W"){
-        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Wall", wall);
+        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "wall", wall);
       }
       else if (gridTiles[y][x] === "B"){
-        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "Bookcase", bookcase);
+        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "bookcase", bookcase);
       }
       else if (gridTiles[y][x] === "1"){
-        gridTiles[y][x] = new Door(x*gameScalar, y*gameScalar, "Door", door, "alley");
+        gridTiles[y][x] = new Door(x*gameScalar, y*gameScalar, "door", doorRight, "alley");
       }
     }
   }
@@ -274,7 +285,7 @@ function assignLevel(){
 function displayStuff(){
   for (let i = 0; i < gridTiles.length; i++){
     for (let j = 0; j < gridTiles.length; j++){
-      if (gridTiles[j][i].type === "Wall" || gridTiles[j][i].type === "Bookcase" || gridTiles[j][i].type === "Door"){
+      if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "door"){
         gridTiles[j][i].displaySelf();
       }
     }
