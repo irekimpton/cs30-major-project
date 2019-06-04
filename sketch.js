@@ -17,6 +17,9 @@ let gameScalar;
 
 let officeLevel;
 let officeLines;
+let alleyLevelOne;
+let alleyLinesOne;
+
 let gridTiles;
 
 let bookcase;
@@ -36,6 +39,8 @@ function preload(){
   ///// LEVELS
   officeLevel = "assets/levels/officeLevel.txt";
   officeLines = loadStrings(officeLevel);
+  alleyLevelOne = "assets/levels/alleyLevelOne.txt";
+  alleyLinesOne = loadStrings(alleyLevelOne);
 
   ///// IMAGES
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
@@ -131,8 +136,6 @@ function gameDisplayLoop(){
   displayStuff();
 }
 
-///////////////////////////////////////////////////////////////////////
-
 function keyPressed(){
   if (gameMode === "game"){
     if (key === "e"){
@@ -150,8 +153,6 @@ function mouseClicked(){
     pickUp();
   }
 }
-
-///////////////////////////////////////////////////////////////////////
 
 function create2dArray(rows, columns){
   let emptyArray = [];
@@ -233,7 +234,7 @@ function moveKirk(){
         kirk.xPos += 1;
       }
     }
-    kirk.image = kirkLeft
+    kirk.image = kirkLeft;
   }
 
   if (keyIsDown(68)){ //RIGHT
@@ -244,7 +245,7 @@ function moveKirk(){
         kirk.xPos -= 1;
       }
     }
-    kirk.image = kirkRight
+    kirk.image = kirkRight;
   }
 }
 
@@ -253,22 +254,29 @@ function invalidMove(){
     for (let x = 0; x < 12; x++) {
       if (gridTiles[x][y] !== "E"){
         if (gridTiles[x][y].type === "wall" || gridTiles[x][y].type === "bookcase"){
-          if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos + gameScalar < gridTiles[x][y].xPos + gameScalar*2) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
-            return true
+          if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos < gridTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
+            return true;
           }
         }
         if (gridTiles[x][y].type === "door"){
-          //CHECK IF ITS IN THE DOOR ISH
+          if ((kirk.xPos + gameScalar/2 > gridTiles[x][y].xPos && kirk.xPos < gridTiles[x][y].xPos + gameScalar/2) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
+            goTo(gridTiles[x][y].destination);
+            return true;
+          }
         }
       }
     }
   }
-  return false
+  return false;
 }
 
 function assignLevel(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
+      if (gridTiles[y][x] === "K"){
+        kirk.xPos = x*gameScalar;
+        kirk.yPos = y*gameScalar;
+      }
       if (gridTiles[y][x] === "W"){
         gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "wall", wall);
       }
@@ -289,6 +297,21 @@ function displayStuff(){
         gridTiles[j][i].displaySelf();
       }
     }
+  }
+}
+
+function goTo(place){
+  if (place === "alley"){
+    for (let y = 0; y < 12; y++) {
+      for (let x = 0; x < 12; x++) {
+        let tileType = alleyLinesOne[x][y];
+        gridTiles[x][y] = tileType;
+      }
+    }
+    kirk.xPos = height/2
+    kirk.yPos = height/2
+    assignLevel();
+    console.log(gridTiles);
   }
 }
 
