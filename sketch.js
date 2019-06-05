@@ -252,7 +252,7 @@ function moveKirk(){
 function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (gridTiles[x][y] !== "E"){
+      if (gridTiles[x][y] !== "."){
         if (gridTiles[x][y].type === "wall" || gridTiles[x][y].type === "bookcase"){
           if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos < gridTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
             return true;
@@ -283,8 +283,14 @@ function assignLevel(){
       else if (gridTiles[y][x] === "B"){
         gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "bookcase", bookcase);
       }
+      else if (gridTiles[y][x] === "D"){
+        gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "dumpster", dumpster);
+      }
       else if (gridTiles[y][x] === "1"){
         gridTiles[y][x] = new Door(x*gameScalar, y*gameScalar, "door", doorRight, "alley");
+      }
+      else if (gridTiles[y][x] === "2"){
+        gridTiles[y][x] = new Door(x*gameScalar, y*gameScalar, "door", doorLeft, "office");
       }
     }
   }
@@ -293,8 +299,10 @@ function assignLevel(){
 function displayStuff(){
   for (let i = 0; i < gridTiles.length; i++){
     for (let j = 0; j < gridTiles.length; j++){
-      if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "door"){
-        gridTiles[j][i].displaySelf();
+      if (gridTiles[j][i] !== "."){
+        if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "door"){
+          gridTiles[j][i].displaySelf();
+        }
       }
     }
   }
@@ -308,11 +316,17 @@ function goTo(place){
         gridTiles[x][y] = tileType;
       }
     }
-    kirk.xPos = height/2
-    kirk.yPos = height/2
-    assignLevel();
-    console.log(gridTiles);
   }
+  if (place === "office"){
+    for (let y = 0; y < 12; y++) {
+      for (let x = 0; x < 12; x++) {
+        let tileType = officeLines[x][y];
+        gridTiles[x][y] = tileType;
+      }
+    }
+  }
+  assignLevel();
+  console.log(gridTiles);
 }
 
 ///////////////////////////////////////////////////////// Classes
