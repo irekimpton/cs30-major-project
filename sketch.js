@@ -32,10 +32,15 @@ let doorLeft;
 let itemFrame;
 let otherItemFrame
 let knuckles;
-let kirkRight;
 let imageList;
 
+let kirkRight;
+let kirkLeft;
+let ferdinandRight;
+
 let kirk;
+
+let enemyList;
 
 function preload(){
   ///// LEVELS
@@ -60,6 +65,8 @@ function preload(){
 
   kirkRight = loadImage("assets/kirk/kirkRight.png");
   kirkLeft = loadImage("assets/kirk/kirkLeft.png");
+
+  ferdinandRight = loadImage("assets/enemies/ferdinandRight.png");
 
   imageList = [knuckles, laserCannon];
 }
@@ -122,6 +129,7 @@ function draw(){
 function gameUpdateLoop(){
   if (paused === false){
     moveKirk();
+    moveEnemies();
   }
 }
 
@@ -258,7 +266,7 @@ function moveKirk(){
 function invalidMove(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
-      if (gridTiles[x][y] !== "."){
+      if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
         if (gridTiles[x][y].type === "wall" || gridTiles[x][y].type === "bookcase"){
           if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos < gridTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos + gameScalar < gridTiles[x][y].yPos + gameScalar)){
             return true;
@@ -286,12 +294,75 @@ function invalidMove(){
   return false;
 }
 
+function checkEnemyX(){
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+        if (gridTiles[x][y].xPos + gameScalar > gridTiles[x][y].xPos && gridTiles[x][y].xPos < gridTiles[x][y].xPos + gameScalar*2){
+            return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function checkEnemyY(){
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+        if (gridTiles[x][y].yPos + gameScalar > gridTiles[x][y].yPos && gridTiles[x][y].yPos < gridTiles[x][y].yPos + gameScalar*2){
+            return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function moveEnemies(){
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (gridTiles[x][y] !== "."){
+        if (gridTiles[x][y].type === "enemy"){
+          for (let i = 0; i < 3; i++){
+            if (kirk.xPos > gridTiles[x][y].xPos){
+              gridTiles[x][y].xPos += 1
+              if (checkEnemyX(i)){
+                gridTiles[x][y].xPos -= 1
+              }
+            }
+            if (kirk.xPos < gridTiles[x][y].xPos){
+              gridTiles[x][y].xPos -= 1
+              if (checkEnemyX(i)){
+                gridTiles[x][y].xPos += 1
+              }
+            }
+            if (kirk.yPos > gridTiles[x][y].yPos){
+              gridTiles[x][y].yPos += 1
+              if (checkEnemyY(i)){
+                gridTiles[x][y].yPos -= 1
+              }
+            }
+            if (kirk.yPos < gridTiles[x][y].yPos){
+              gridTiles[x][y].yPos -= 1
+              if (checkEnemyY(i)){
+                gridTiles[x][y].yPos += 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 function assignLevel(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
       if (gridTiles[y][x] === "K"){
         kirk.xPos = x*gameScalar;
-        kirk.yPos = y*gameScalar;
+        kirk.yPos = y*gameScalar - gameScalar;
       }
       if (gridTiles[y][x] === "W"){
         gridTiles[y][x] = new SetPiece(x*gameScalar, y*gameScalar, "wall", wall);
@@ -311,6 +382,9 @@ function assignLevel(){
       else if (gridTiles[y][x] === "2"){
         gridTiles[y][x] = new Door(x*gameScalar, y*gameScalar, "door", doorLeft, "office");
       }
+      else if (gridTiles[y][x] === "E"){
+        gridTiles[y][x] = new Enemy(x*gameScalar, y*gameScalar, "enemy", ferdinandRight);
+      }
     }
   }
 }
@@ -319,7 +393,7 @@ function displayStuff(){
   for (let i = 0; i < gridTiles.length; i++){
     for (let j = 0; j < gridTiles.length; j++){
       if (gridTiles[j][i] !== "."){
-        if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "door" || gridTiles[j][i].type === "dumpster" || gridTiles[j][i].type === "desk"){
+        if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "door" || gridTiles[j][i].type === "dumpster" || gridTiles[j][i].type === "desk" || gridTiles[j][i].type === "enemy"){
           gridTiles[j][i].displaySelf();
         }
       }
@@ -382,5 +456,22 @@ class Door{
 
   displaySelf(){
     image(this.image, this.xPos, this.yPos - gameScalar, gameScalar, 2*gameScalar);
+  }
+}
+
+class Enemy{
+  constructor(xPos, yPos, type, image){
+    this.type = type
+    this.image = image;
+    this.xPos = xPos;
+    this.yPos = yPos;
+  }
+
+  displaySelf(){
+    image(this.image, this.xPos, this.yPos - gameScalar, gameScalar, 2*gameScalar);
+  }
+
+  recall(){
+
   }
 }
