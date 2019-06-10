@@ -42,12 +42,17 @@ let kirk;
 
 let enemyList;
 
+let officeMusic;
+
 function preload(){
   ///// LEVELS
   officeLevel = "assets/levels/officeLevel.txt";
   officeLines = loadStrings(officeLevel);
   alleyLevelOne = "assets/levels/alleyLevelOne.txt";
   alleyLinesOne = loadStrings(alleyLevelOne);
+
+  ///// MUSIC
+  officeMusic = loadSound("assets/music/officeMusic.mp3");
 
   ///// IMAGES
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
@@ -95,6 +100,8 @@ function setup() {
   assignLevel();
   kirk.xPos = floor(height/2-gameScalar/2);
   kirk.yPos = floor(height/2-gameScalar);
+  
+  officeMusic.loop();
 
   inventoryGridSize = 4;
   inventoryScalar = height*3/4/inventoryGridSize;
@@ -119,7 +126,6 @@ function draw(){
       gameUpdateLoop();
     }
     gameDisplayLoop();
-
     if (paused === true){
       pausedDrawLoop();
     }
@@ -147,7 +153,9 @@ function gameDisplayLoop(){
   background(75);
   imageMode(CORNER);
   displayStuff();
+  displayEnemies();
   image(kirk.image, kirk.xPos, kirk.yPos, gameScalar, 2*gameScalar);
+  displayDoors();
 }
 
 function keyPressed(){
@@ -156,6 +164,10 @@ function keyPressed(){
       paused = !paused;
     }
   }
+}
+
+function honk(){
+  console.log("honk");
 }
 
 function windowResized(){
@@ -230,6 +242,7 @@ function moveKirk(){
     }
   }
 
+
   if (keyIsDown(83)){ //DOWN
     for(let i = 0; i < kirk.speed; i++){
       kirk.yPos += 1;
@@ -294,63 +307,12 @@ function invalidMove(){
   return false;
 }
 
-function checkEnemyX(){
-  for (let y = 0; y < 12; y++){
-    for (let x = 0; x < 12; x++) {
-      if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
-        if (gridTiles[x][y].xPos + gameScalar > gridTiles[x][y].xPos && gridTiles[x][y].xPos < gridTiles[x][y].xPos + gameScalar*2){
-            return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-function checkEnemyY(){
-  for (let y = 0; y < 12; y++){
-    for (let x = 0; x < 12; x++) {
-      if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
-        if (gridTiles[x][y].yPos + gameScalar > gridTiles[x][y].yPos && gridTiles[x][y].yPos < gridTiles[x][y].yPos + gameScalar*2){
-            return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
 function moveEnemies(){
   for (let y = 0; y < 12; y++){
     for (let x = 0; x < 12; x++) {
       if (gridTiles[x][y] !== "."){
         if (gridTiles[x][y].type === "enemy"){
-          for (let i = 0; i < 3; i++){
-            if (kirk.xPos > gridTiles[x][y].xPos){
-              gridTiles[x][y].xPos += 1
-              if (checkEnemyX(i)){
-                gridTiles[x][y].xPos -= 1
-              }
-            }
-            if (kirk.xPos < gridTiles[x][y].xPos){
-              gridTiles[x][y].xPos -= 1
-              if (checkEnemyX(i)){
-                gridTiles[x][y].xPos += 1
-              }
-            }
-            if (kirk.yPos > gridTiles[x][y].yPos){
-              gridTiles[x][y].yPos += 1
-              if (checkEnemyY(i)){
-                gridTiles[x][y].yPos -= 1
-              }
-            }
-            if (kirk.yPos < gridTiles[x][y].yPos){
-              gridTiles[x][y].yPos -= 1
-              if (checkEnemyY(i)){
-                gridTiles[x][y].yPos += 1
-              }
-            }
-          }
+          gridTiles[x][y].moveSelf();
         }
       }
     }
@@ -393,7 +355,31 @@ function displayStuff(){
   for (let i = 0; i < gridTiles.length; i++){
     for (let j = 0; j < gridTiles.length; j++){
       if (gridTiles[j][i] !== "."){
-        if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "door" || gridTiles[j][i].type === "dumpster" || gridTiles[j][i].type === "desk" || gridTiles[j][i].type === "enemy"){
+        if (gridTiles[j][i].type === "wall" || gridTiles[j][i].type === "bookcase" || gridTiles[j][i].type === "dumpster" || gridTiles[j][i].type === "desk"){
+          gridTiles[j][i].displaySelf();
+        }
+      }
+    }
+  }
+}
+
+function displayDoors(){
+  for (let i = 0; i < gridTiles.length; i++){
+    for (let j = 0; j < gridTiles.length; j++){
+      if (gridTiles[j][i] !== "."){
+        if (gridTiles[j][i].type === "door"){
+          gridTiles[j][i].displaySelf();
+        }
+      }
+    }
+  }
+}
+
+function displayEnemies(){
+  for (let i = 0; i < gridTiles.length; i++){
+    for (let j = 0; j < gridTiles.length; j++){
+      if (gridTiles[j][i] !== "."){
+        if (gridTiles[j][i].type === "enemy"){
           gridTiles[j][i].displaySelf();
         }
       }
@@ -409,6 +395,9 @@ function goTo(place){
         gridTiles[x][y] = tileType;
       }
     }
+    if (officeMusic.isPlaying()){
+      stop();
+    }
   }
   if (place === "office"){
     for (let y = 0; y < 12; y++) {
@@ -419,6 +408,7 @@ function goTo(place){
     }
   }
   assignLevel();
+  officeMusic.loop();
   console.log(gridTiles);
 }
 
@@ -468,10 +458,50 @@ class Enemy{
   }
 
   displaySelf(){
-    image(this.image, this.xPos, this.yPos - gameScalar, gameScalar, 2*gameScalar);
+    image(this.image, this.xPos, this.yPos, gameScalar, 2*gameScalar);
   }
 
-  recall(){
+  moveSelf(){
+    for (let i = 0; i < 2; i++){
+      if (kirk.xPos > this.xPos){
+        this.xPos += 1
+        if (this.checkSelf()){
+          this.xPos -= 1
+        }
+      }
+      else if (kirk.xPos < this.xPos){
+        this.xPos -= 1
+        if (this.checkSelf()){
+          this.xPos += 1
+        }
+      }
+      if (kirk.yPos > this.yPos){
+        this.yPos += 1
+        if (this.checkSelf()){
+          this.yPos -= 1
+        }
+      }
+      else if (kirk.yPos < this.yPos){
+        this.yPos -= 1
+        if (this.checkSelf()){
+          this.yPos += 1
+        }
+      }
+    }
+  }
 
+  checkSelf(){
+    for (let y = 0; y < 12; y++){
+      for (let x = 0; x < 12; x++) {
+        if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+          if (gridTiles[x][y].type === "wall" || gridTiles[x][y].type === "bookcase"){
+            if ((this.xPos + gameScalar > gridTiles[x][y].xPos && this.xPos < gridTiles[x][y].xPos  + gameScalar) && (this.yPos + gameScalar*2 > gridTiles[x][y].yPos && this.yPos + gameScalar < gridTiles[x][y].yPos + gameScalar)){
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 }
