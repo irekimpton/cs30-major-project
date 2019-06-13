@@ -36,13 +36,17 @@ let imageList;
 
 let kirkRight;
 let kirkLeft;
+let kirkPunchRight;
+let kirkPunchLeft;
 let ferdinandRight;
 
 let kirk;
+let score = 0;
 
 let enemyList;
 
 let officeMusic;
+let alleySounds
 
 function preload(){
   ///// LEVELS
@@ -53,6 +57,7 @@ function preload(){
 
   ///// MUSIC
   officeMusic = loadSound("assets/music/officeMusic.mp3");
+  alleySounds = loadSound("assets/music/alleySounds.wav");
 
   ///// IMAGES
   itemFrame = loadImage("assets/miscSprites/itemFrame.png");
@@ -70,6 +75,8 @@ function preload(){
 
   kirkRight = loadImage("assets/kirk/kirkRight.png");
   kirkLeft = loadImage("assets/kirk/kirkLeft.png");
+  kirkPunchRight = loadImage("assets/kirk/kirkPunchRight.png");
+  kirkPunchLeft = loadImage("assets/kirk/kirkPunchLeft.png");
 
   ferdinandRight = loadImage("assets/enemies/ferdinandRight.png");
 
@@ -136,6 +143,7 @@ function gameUpdateLoop(){
   if (paused === false){
     moveKirk();
     moveEnemies();
+    checkDeath();
   }
 }
 
@@ -156,6 +164,9 @@ function gameDisplayLoop(){
   displayEnemies();
   image(kirk.image, kirk.xPos, kirk.yPos, gameScalar, 2*gameScalar);
   displayDoors();
+  fill(0);
+  textSize(50);
+  text("Score: " + score, height, 50);
 }
 
 function keyPressed(){
@@ -177,6 +188,11 @@ function windowResized(){
 function mouseClicked(){
   if (paused === true){
     pickUp();
+  }
+  else{
+    if (inventoryGrid[0][3] === 1){
+      fistAttack();
+    }
   }
 }
 
@@ -395,9 +411,9 @@ function goTo(place){
         gridTiles[x][y] = tileType;
       }
     }
-    if (officeMusic.isPlaying()){
-      stop();
-    }
+    officeMusic.stop();
+    alleySounds.loop();
+    setInterval(newEnemy(), 5000);
   }
   if (place === "office"){
     for (let y = 0; y < 12; y++) {
@@ -406,10 +422,106 @@ function goTo(place){
         gridTiles[x][y] = tileType;
       }
     }
+    alleySounds.stop();
+    officeMusic.loop();
   }
   assignLevel();
-  officeMusic.loop();
   console.log(gridTiles);
+}
+
+function checkDeath(){
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+        if (gridTiles[x][y].type === "enemy"){
+          if ((kirk.xPos + gameScalar > gridTiles[x][y].xPos && kirk.xPos < gridTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar*2 > gridTiles[x][y].yPos && kirk.yPos < gridTiles[x][y].yPos + gameScalar*2)){
+            endGame();
+          }
+        }
+      }
+    }
+  }
+}
+
+function endGame(){
+  kirk.xPos = height/2;
+  kirk.yPos = -10000;
+}
+
+function fistAttack(){
+  if (kirk.image === kirkRight){
+    kirk.image = kirkPunchRight;
+    for (let y = 0; y < 12; y++){
+      for (let x = 0; x < 12; x++) {
+        if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+          if (gridTiles[x][y].type === "enemy"){
+            if ((kirk.xPos + gameScalar < gridTiles[x][y].xPos && kirk.xPos + gameScalar*3/2 > gridTiles[x][y].xPos) && (kirk.yPos + gameScalar > gridTiles[x][y].yPos && kirk.yPos - gameScalar < gridTiles[x][y].yPos)){
+              let temp = floor(random(0, 2));
+              if (temp === 0){
+                temp = -height/2;
+              }
+              else{
+                temp = height*3/2;
+              }
+              gridTiles[x][y].xPos = floor(random(0, height));
+              gridTiles[x][y].yPos = temp;
+              score += 10
+            }
+          }
+        }
+      }
+    }
+  }
+  if (kirk.image === kirkLeft){
+    kirk.image = kirkPunchLeft;
+    for (let y = 0; y < 12; y++){
+      for (let x = 0; x < 12; x++) {
+        if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+          if (gridTiles[x][y].type === "enemy"){
+            if ((kirk.xPos > gridTiles[x][y].xPos + gameScalar && kirk.xPos - gameScalar/2 < gridTiles[x][y].xPos + gameScalar) && (kirk.yPos + gameScalar > gridTiles[x][y].yPos && kirk.yPos - gameScalar < gridTiles[x][y].yPos)){
+              let temp = floor(random(0, 2));
+              if (temp === 0){
+                temp = -height/2;
+              }
+              else{
+                temp = height*3/2;
+              }
+              gridTiles[x][y].xPos = floor(random(0, height));
+              gridTiles[x][y].yPos = temp;
+            }
+          }
+        }
+      }
+    }
+  }
+  setTimeout(resetImage, 250);
+}
+
+function resetImage(){
+  if (kirk.image === kirkPunchLeft){
+    kirk.image = kirkLeft;
+  }
+  if (kirk.image === kirkPunchRight){
+    kirk.image = kirkRight;
+  }
+}
+
+function newEnemy(){
+  for (let y = 0; y < 12; y++){
+    for (let x = 0; x < 12; x++) {
+      if (gridTiles[x][y] === "."){
+        let temp = floor(random(0, 2));
+        if (temp === 0){
+          temp = -height/2;
+        }
+        else{
+          temp = height*3/2;
+        }
+        gridTiles[x][y] = new Enemy(floor(random(0, height)), temp, "enemy", ferdinandRight)
+        return;
+      }
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////// Classes
@@ -496,6 +608,11 @@ class Enemy{
         if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
           if (gridTiles[x][y].type === "wall" || gridTiles[x][y].type === "bookcase"){
             if ((this.xPos + gameScalar > gridTiles[x][y].xPos && this.xPos < gridTiles[x][y].xPos  + gameScalar) && (this.yPos + gameScalar*2 > gridTiles[x][y].yPos && this.yPos + gameScalar < gridTiles[x][y].yPos + gameScalar)){
+              return true;
+            }
+          }
+          if (gridTiles[x][y].type === "dumpster"){
+            if ((this.xPos + gameScalar > gridTiles[x][y].xPos && this.xPos < gridTiles[x][y].xPos  + gameScalar*2) && (this.yPos + gameScalar*2 > gridTiles[x][y].yPos && this.yPos + gameScalar < gridTiles[x][y].yPos + gameScalar*2)){
               return true;
             }
           }
