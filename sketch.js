@@ -42,6 +42,7 @@ let ferdinandRight;
 
 let kirk;
 let score = 0;
+let canFire = true;
 
 let enemyList;
 
@@ -64,7 +65,8 @@ function preload(){
   otherItemFrame = loadImage("assets/miscSprites/otherItemFrame.png");
 
   knuckles = loadImage("assets/items/knuckles.png");
-  laserCannon = loadImage("assets/items/laserCannon.png");
+  laserCannonRight = loadImage("assets/items/laserCannonRight.png");
+  laserCannonLeft = loadImage("assets/items/laserCannonLeft.png");
 
   bookcase = loadImage("assets/setPieces/bookcase.png");
   wall = loadImage("assets/setPieces/wall.png");
@@ -80,7 +82,7 @@ function preload(){
 
   ferdinandRight = loadImage("assets/enemies/ferdinandRight.png");
 
-  imageList = [knuckles, laserCannon];
+  imageList = [knuckles, laserCannonRight];
 }
 
 function setup() {
@@ -163,6 +165,14 @@ function gameDisplayLoop(){
   displayStuff();
   displayEnemies();
   image(kirk.image, kirk.xPos, kirk.yPos, gameScalar, 2*gameScalar);
+  if (inventoryGrid[0][3] === 2){
+    if (kirk.image === kirkRight){
+      image(laserCannonRight, kirk.xPos, kirk.yPos+gameScalar*5/8, gameScalar, gameScalar);
+    }
+    if (kirk.image === kirkLeft){
+      image(laserCannonLeft, kirk.xPos, kirk.yPos+gameScalar*5/8, gameScalar, gameScalar);
+    }
+  }
   displayDoors();
   fill(0);
   textSize(50);
@@ -192,6 +202,9 @@ function mouseClicked(){
   else{
     if (inventoryGrid[0][3] === 1){
       fistAttack();
+    }
+    if (inventoryGrid[0][3] === 2){
+      laserAttack();
     }
   }
 }
@@ -488,6 +501,7 @@ function fistAttack(){
               }
               gridTiles[x][y].xPos = floor(random(0, height));
               gridTiles[x][y].yPos = temp;
+              score += 10;
             }
           }
         }
@@ -497,6 +511,57 @@ function fistAttack(){
   setTimeout(resetImage, 250);
 }
 
+function laserAttack(){
+  if(canFire){
+    canFire = false;
+    if (kirk.image === kirkLeft){
+      for (let y = 0; y < 12; y++){
+        for (let x = 0; x < 12; x++) {
+          if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+            if (gridTiles[x][y].type === "enemy"){
+              if ((kirk.xPos > gridTiles[x][y].xPos) && (kirk.yPos > gridTiles[x][y].yPos - gameScalar && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
+                let temp = floor(random(0, 2));
+                if (temp === 0){
+                  temp = -height/2;
+                }
+                else{
+                  temp = height*3/2;
+                }
+                gridTiles[x][y].xPos = floor(random(0, height));
+                gridTiles[x][y].yPos = temp;
+                score += 10;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (kirk.image === kirkRight){
+      for (let y = 0; y < 12; y++){
+        for (let x = 0; x < 12; x++) {
+          if (gridTiles[x][y] !== "." && gridTiles[x][y] !== "K"){
+            if (gridTiles[x][y].type === "enemy"){
+              if ((kirk.xPos < gridTiles[x][y].xPos) && (kirk.yPos > gridTiles[x][y].yPos - gameScalar && kirk.yPos < gridTiles[x][y].yPos + gameScalar)){
+                let temp = floor(random(0, 2));
+                if (temp === 0){
+                  temp = -height/2;
+                }
+                else{
+                  temp = height*3/2;
+                }
+                gridTiles[x][y].xPos = floor(random(0, height));
+                gridTiles[x][y].yPos = temp;
+                score += 10;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  setTimeout(laserTimeout, 2000);
+}
+
 function resetImage(){
   if (kirk.image === kirkPunchLeft){
     kirk.image = kirkLeft;
@@ -504,6 +569,10 @@ function resetImage(){
   if (kirk.image === kirkPunchRight){
     kirk.image = kirkRight;
   }
+}
+
+function laserTimeout(){
+  canFire = true;
 }
 
 function newEnemy(){
